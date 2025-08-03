@@ -20,7 +20,7 @@ import { itemsStorage, ItemsStorage } from "@/storage/itemsStorage"
 const FILTER_STATUS: FilterStatus[] = [FilterStatus.PENDING, FilterStatus.DONE]
 
 export function Home() {
-  const [filter, setFilter] = useState<FilterStatus>()
+  const [filter, setFilter] = useState(FilterStatus.PENDING)
   const [description, setDescription] = useState("")
   const [items, setItems] = useState<ItemsStorage[]>([])
 
@@ -35,12 +35,12 @@ export function Home() {
       status: FilterStatus.PENDING,
     }
     await itemsStorage.add(newItem)
-    await getItems()
+    await itemsByStatus()
   }
 
-  async function getItems() {
+  async function itemsByStatus() {
     try {
-      const response = await itemsStorage.get()
+      const response = await itemsStorage.getByStatus(filter)
       setItems(response)
     } catch (error) {
       console.log(error)
@@ -49,8 +49,8 @@ export function Home() {
   }
 
   useEffect(() => {
-    getItems()
-  }, [])
+    itemsByStatus()
+  }, [filter])
 
   return (
     <View style={styles.container}>
